@@ -9,6 +9,7 @@ int main()
 
 	reader.DisplayFbxContent(reader.GetRoot());
 
+	reader.CleanUp();
 	char pause_char;
 	cin >> pause_char;
 	return 0;

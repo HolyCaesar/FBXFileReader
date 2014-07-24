@@ -35,6 +35,11 @@ private:
 	*/
 	void ConstructTreeNode(ifstream &input_file, FileNode* root);
 
+	/*
+	* Clean the Tree Structure
+	*/
+	void CleanSubProperties(FileNode* node);
+
 private:
 	FileNode* _file_root;
 };

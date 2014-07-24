@@ -47,7 +47,7 @@ void FbxFileReader::DisplayFbxContent(FileNode* node)
 
 void FbxFileReader::CleanUp()
 {
-
+	CleanSubProperties(_file_root);
 }
 
 /* Private Functions Definition */
@@ -106,4 +106,14 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FileNode* root)
 		
 		//cout << tmp_line_buffer << endl;
 	}
+}
+
+void FbxFileReader::CleanSubProperties(FileNode* sub_property)
+{
+	if(sub_property->_sub_property.size() == 0) return;
+
+	for(int i = 0; i < sub_property->_sub_property.size(); i++) {
+		CleanSubProperties(&(sub_property->_sub_property[i]));
+	}
+	sub_property->Destroy();
 }
