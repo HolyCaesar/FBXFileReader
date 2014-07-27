@@ -7,7 +7,9 @@ int main()
 
 	reader.ReadFbxASCIIFile("C:\\Users\\Rjb\\Desktop\\test.txt");
 
-	reader.DisplayFbxContent(reader.GetRoot());
+	//reader.DisplayFbxContent(reader.GetRoot());
+
+	reader.ExtractBoneInfo();
 
 	reader.CleanUp();
 	char pause_char;
