@@ -5,7 +5,7 @@ int main()
 {
 	FbxFileReader reader;
 
-	reader.ReadFbxASCIIFile("C:\\Users\\Rjb\\Desktop\\test.txt");
+	reader.ReadFbxASCIIFile("test.txt");
 
 	reader.DisplayFbxContent(reader.GetRoot());
 
