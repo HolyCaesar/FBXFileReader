@@ -67,7 +67,7 @@ private:
 	/*
 	* Locate certain type of property
 	*/
-	void LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode>& res, bool flag);
+	void LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode*>& res, bool flag);
 
 private:
 	FbxFileNode* _file_root;

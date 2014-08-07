@@ -13,6 +13,6 @@ public:
 public:
 	string _property_name;
 	vector<string> _primitive_data;
-	vector<FbxFileNode> _sub_property;
+	vector<FbxFileNode*> _sub_property;
 };
 

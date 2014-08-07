@@ -40,7 +40,7 @@ void FbxFileReader::DisplayFbxContent(FbxFileNode* node)
 	cout << endl;
 
 	for(int i = 0; i < node->_sub_property.size(); i++) {
-		DisplayFbxContent(&(node->_sub_property[i]));
+		DisplayFbxContent(node->_sub_property[i]);
 	}
 }
 
@@ -52,16 +52,16 @@ void FbxFileReader::CleanUp()
 /* Bone information */
 void FbxFileReader::ExtractBoneInfo()
 {
-	vector<FbxFileNode> properties_vec;
+	vector<FbxFileNode*> properties_vec;
 	LocateProperty(_file_root, "Model", properties_vec, false);
 
 	for(int i = 0; i < properties_vec.size(); i++) {
-		if(properties_vec[i]._primitive_data[2] != "\"LimbNode\"") continue;
+		if(properties_vec[i]->_primitive_data[2] != "\"LimbNode\"") continue;
 
-		FbxFileNode tmp_property;
-		for(int j = 0; j < properties_vec[i]._sub_property.size(); j++) {
-			if(properties_vec[i]._sub_property[j]._property_name == "Properties70") {
-				tmp_property = properties_vec[i]._sub_property[j];
+		FbxFileNode* tmp_property;
+		for(int j = 0; j < properties_vec[i]->_sub_property.size(); j++) {
+			if(properties_vec[i]->_sub_property[j]->_property_name == "Properties70") {
+				tmp_property = properties_vec[i]->_sub_property[j];
 				break;
 			}
 		}
@@ -69,28 +69,28 @@ void FbxFileReader::ExtractBoneInfo()
 		// Load Joint Info
 		JointInfo tmp_joint_info;
 		memset(&tmp_joint_info, 0, sizeof(tmp_joint_info));
-		tmp_joint_info._id = atol(properties_vec[i]._primitive_data[0].c_str());
-		for(int j = 0; j < tmp_property._sub_property.size(); j++) {
-			string property = tmp_property._sub_property[j]._primitive_data[0];
+		tmp_joint_info._id = atol(properties_vec[i]->_primitive_data[0].c_str());
+		for(int j = 0; j < tmp_property->_sub_property.size(); j++) {
+			string property = tmp_property->_sub_property[j]->_primitive_data[0];
 			// Get PreRotation Data
 			if(property == "\"PreRotation\"") {
-				int primitive_num = tmp_property._sub_property[j]._primitive_data.size();
-				tmp_joint_info._pre_rotation[0] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 3].c_str());
-				tmp_joint_info._pre_rotation[1] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 2].c_str());
-				tmp_joint_info._pre_rotation[2] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 1].c_str());
+				int primitive_num = tmp_property->_sub_property[j]->_primitive_data.size();
+				tmp_joint_info._pre_rotation[0] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 3].c_str());
+				tmp_joint_info._pre_rotation[1] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 2].c_str());
+				tmp_joint_info._pre_rotation[2] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 1].c_str());
 			}
 			else if(property == "\"Lcl") {
-				if(tmp_property._sub_property[j]._primitive_data[1] == "Translation\"") {
-					int primitive_num = tmp_property._sub_property[j]._primitive_data.size();
-					tmp_joint_info._lcl_translation[0] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 3].c_str());
-					tmp_joint_info._lcl_translation[1] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 2].c_str());
-					tmp_joint_info._lcl_translation[2] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 1].c_str());
+				if(tmp_property->_sub_property[j]->_primitive_data[1] == "Translation\"") {
+					int primitive_num = tmp_property->_sub_property[j]->_primitive_data.size();
+					tmp_joint_info._lcl_translation[0] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 3].c_str());
+					tmp_joint_info._lcl_translation[1] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 2].c_str());
+					tmp_joint_info._lcl_translation[2] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 1].c_str());
 				}
-				else if(tmp_property._sub_property[j]._primitive_data[1] == "Translation\"") {
-					int primitive_num = tmp_property._sub_property[j]._primitive_data.size();
-					tmp_joint_info._lcl_rotation[0] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 3].c_str());
-					tmp_joint_info._lcl_rotation[1] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 2].c_str());
-					tmp_joint_info._lcl_rotation[2] = atof(tmp_property._sub_property[j]._primitive_data[primitive_num - 1].c_str());
+				else if(tmp_property->_sub_property[j]->_primitive_data[1] == "Translation\"") {
+					int primitive_num = tmp_property->_sub_property[j]->_primitive_data.size();
+					tmp_joint_info._lcl_rotation[0] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 3].c_str());
+					tmp_joint_info._lcl_rotation[1] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 2].c_str());
+					tmp_joint_info._lcl_rotation[2] = atof(tmp_property->_sub_property[j]->_primitive_data[primitive_num - 1].c_str());
 				}
 			}
 		}
@@ -102,19 +102,19 @@ void FbxFileReader::ExtractBoneInfo()
 	LocateProperty(_file_root, "Pose", properties_vec, false);
 	BindPoseInfo tmp_bindpose_info;
 	for(int i = 0; i < properties_vec.size(); i++) {
-		FbxFileNode tmp_property = properties_vec[i];
-		for(int j = 0; j < tmp_property._sub_property.size(); j++) {
-			if(tmp_property._sub_property[j]._property_name == "PoseNode"){
-				FbxFileNode matrix_node = tmp_property._sub_property[j]._sub_property[1]._sub_property[0];
-				for(int k = 0; k < matrix_node._primitive_data.size(); k++){
-					tmp_bindpose_info._matrix[k] = atof(matrix_node._primitive_data[k].c_str());
+		FbxFileNode* tmp_property = properties_vec[i];
+		for(int j = 0; j < tmp_property->_sub_property.size(); j++) {
+			if(tmp_property->_sub_property[j]->_property_name == "PoseNode"){
+				FbxFileNode* matrix_node = tmp_property->_sub_property[j]->_sub_property[1]->_sub_property[0];
+				for(int k = 0; k < matrix_node->_primitive_data.size(); k++){
+					tmp_bindpose_info._matrix[k] = atof(matrix_node->_primitive_data[k].c_str());
 				}
 				_bind_pose_info_vec.push_back(tmp_bindpose_info);
 			}
 		}
 	}
-	//char cc;
-	//cin >> cc;
+	char cc;
+	cin >> cc;
 }
 
 /* Private Functions Definition */
@@ -157,22 +157,23 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FbxFileNode* root)
 
 		// Read the nested property
 		if(tmp_vec.size() != 0 && tmp_vec[tmp_vec.size() - 1] == "{") {
-			FbxFileNode new_property_node;
-			new_property_node._property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
+			FbxFileNode *new_property_node = new FbxFileNode();
+			new_property_node->_property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
 			for(int i = 1; i < tmp_vec.size() - 1; i++) {
-				new_property_node._primitive_data.push_back(tmp_vec[i]);
+				new_property_node->_primitive_data.push_back(tmp_vec[i]);
 			}
 
-			ConstructTreeNode(input_file, &new_property_node);
+			ConstructTreeNode(input_file, new_property_node);
 			root->_sub_property.push_back(new_property_node);
+			
 			continue;
 		}
 
 		// Read the property
-		FbxFileNode new_property_node;
-		new_property_node._property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
+		FbxFileNode* new_property_node = new FbxFileNode();
+		new_property_node->_property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
 		for(int i = 1; i < tmp_vec.size(); i++) {
-			new_property_node._primitive_data.push_back(tmp_vec[i]);
+			new_property_node->_primitive_data.push_back(tmp_vec[i]);
 		}
 		root->_sub_property.push_back(new_property_node);
 	}
@@ -180,17 +181,17 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FbxFileNode* root)
 
 }
 
-void FbxFileReader::LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode> &res, bool flag)
+void FbxFileReader::LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode*> &res, bool flag)
 {
 	if(flag == true) return;
 
 	for(int i = 0; i < root->_sub_property.size(); i++) {
-		if(root->_sub_property[i]._property_name == property_name) {
+		if(root->_sub_property[i]->_property_name == property_name) {
 			res.push_back(root->_sub_property[i]);
 			flag = true;
 		}
 		else {
-			LocateProperty(&(root->_sub_property[i]), property_name, res, false);
+			LocateProperty(root->_sub_property[i], property_name, res, false);
 		}
 	}
 }
@@ -200,7 +201,8 @@ void FbxFileReader::CleanSubProperties(FbxFileNode* sub_property)
 	if(sub_property->_sub_property.size() == 0) return;
 
 	for(int i = 0; i < sub_property->_sub_property.size(); i++) {
-		CleanSubProperties(&(sub_property->_sub_property[i]));
+		CleanSubProperties(sub_property->_sub_property[i]);
 	}
 	sub_property->Destroy();
+	delete sub_property;
 }
