@@ -2,17 +2,17 @@
 
 #include "CommonHeader.h"
 
-class FileNode
+class FbxFileNode
 {
 public:
-	FileNode(void);
-	~FileNode(void);
+	FbxFileNode(void);
+	~FbxFileNode(void);
 
 	void Destroy();
 
 public:
 	string _property_name;
 	vector<string> _primitive_data;
-	vector<FileNode> _sub_property;
+	vector<FbxFileNode> _sub_property;
 };
 

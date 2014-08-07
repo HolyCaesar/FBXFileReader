@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <cstring>
 #include <cmath>
+#include <ctime>
 #include <vector>
 #include <sstream>
 #include <iterator>

@@ -3,7 +3,7 @@
 
 FbxFileReader::FbxFileReader(void)
 {
-	_file_root = new FileNode();
+	_file_root = new FbxFileNode();
 	_file_root->_property_name = "Root";
 	_file_root->_sub_property.clear();
 	_file_root->_primitive_data.clear();
@@ -28,7 +28,7 @@ void FbxFileReader::ReadFbxASCIIFile(const string file_path)
 	input_file.close();
 }
 
-void FbxFileReader::DisplayFbxContent(FileNode* node)
+void FbxFileReader::DisplayFbxContent(FbxFileNode* node)
 {
 	if(node->_property_name == "") return;
 
@@ -52,11 +52,13 @@ void FbxFileReader::CleanUp()
 /* Bone information */
 void FbxFileReader::ExtractBoneInfo()
 {
-	vector<FileNode> properties_vec;
+	vector<FbxFileNode> properties_vec;
 	LocateProperty(_file_root, "Model", properties_vec, false);
 
 	for(int i = 0; i < properties_vec.size(); i++) {
-		FileNode tmp_property;
+		if(properties_vec[i]._primitive_data[2] != "\"LimbNode\"") continue;
+
+		FbxFileNode tmp_property;
 		for(int j = 0; j < properties_vec[i]._sub_property.size(); j++) {
 			if(properties_vec[i]._sub_property[j]._property_name == "Properties70") {
 				tmp_property = properties_vec[i]._sub_property[j];
@@ -100,10 +102,10 @@ void FbxFileReader::ExtractBoneInfo()
 	LocateProperty(_file_root, "Pose", properties_vec, false);
 	BindPoseInfo tmp_bindpose_info;
 	for(int i = 0; i < properties_vec.size(); i++) {
-		FileNode tmp_property = properties_vec[i];
+		FbxFileNode tmp_property = properties_vec[i];
 		for(int j = 0; j < tmp_property._sub_property.size(); j++) {
 			if(tmp_property._sub_property[j]._property_name == "PoseNode"){
-				FileNode matrix_node = tmp_property._sub_property[j]._sub_property[1]._sub_property[0];
+				FbxFileNode matrix_node = tmp_property._sub_property[j]._sub_property[1]._sub_property[0];
 				for(int k = 0; k < matrix_node._primitive_data.size(); k++){
 					tmp_bindpose_info._matrix[k] = atof(matrix_node._primitive_data[k].c_str());
 				}
@@ -111,18 +113,21 @@ void FbxFileReader::ExtractBoneInfo()
 			}
 		}
 	}
-	char cc;
-	cin >> cc;
+	//char cc;
+	//cin >> cc;
 }
 
 /* Private Functions Definition */
 
-void FbxFileReader::ConstructTreeNode(ifstream &input_file, FileNode* root)
+void FbxFileReader::ConstructTreeNode(ifstream &input_file, FbxFileNode* root)
 {
 	string tmp_line_buffer;
+	clock_t start = clock();
+
 	while(!input_file.eof()) {
 		// Read data line by line
 		getline(input_file, tmp_line_buffer);
+
 
 		// Remove \t manually
 		string tmp_str = "";
@@ -140,8 +145,7 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FileNode* root)
 		// Skip the comment part
 		if(!tmp_line_buffer.empty() && tmp_line_buffer[0] == ';') continue;
 		// If touch '}', this means the end of the block
-		if(/*tmp_line_buffer.size() == 1 && */tmp_line_buffer[0] == '}') return;
-
+		if(tmp_line_buffer[0] == '}') return;
 
 		// Split the line by delimiter space(' ')
 		vector<string> tmp_vec;
@@ -151,12 +155,9 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FileNode* root)
 			tmp_vec.push_back(tmp_str);
 		}
 
-		// TEST code
-		//cout << tmp_line_buffer << endl;
-
 		// Read the nested property
 		if(tmp_vec.size() != 0 && tmp_vec[tmp_vec.size() - 1] == "{") {
-			FileNode new_property_node;
+			FbxFileNode new_property_node;
 			new_property_node._property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
 			for(int i = 1; i < tmp_vec.size() - 1; i++) {
 				new_property_node._primitive_data.push_back(tmp_vec[i]);
@@ -168,16 +169,18 @@ void FbxFileReader::ConstructTreeNode(ifstream &input_file, FileNode* root)
 		}
 
 		// Read the property
-		FileNode new_property_node;
+		FbxFileNode new_property_node;
 		new_property_node._property_name = tmp_vec[0].substr(0, tmp_vec[0].size() - 1);
 		for(int i = 1; i < tmp_vec.size(); i++) {
 			new_property_node._primitive_data.push_back(tmp_vec[i]);
 		}
 		root->_sub_property.push_back(new_property_node);
 	}
+		cout << "Time elapse " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
+
 }
 
-void FbxFileReader::LocateProperty(FileNode* root, string property_name, vector<FileNode> &res, bool flag)
+void FbxFileReader::LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode> &res, bool flag)
 {
 	if(flag == true) return;
 
@@ -192,7 +195,7 @@ void FbxFileReader::LocateProperty(FileNode* root, string property_name, vector<
 	}
 }
 
-void FbxFileReader::CleanSubProperties(FileNode* sub_property)
+void FbxFileReader::CleanSubProperties(FbxFileNode* sub_property)
 {
 	if(sub_property->_sub_property.size() == 0) return;
 

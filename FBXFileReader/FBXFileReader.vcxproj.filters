@@ -21,7 +21,7 @@
     <ClInclude Include="CommonHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileNode.h">
+    <ClInclude Include="FbxFileNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,10 +29,10 @@
     <ClCompile Include="FbxFileReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileNode.cpp">
+    <ClCompile Include="Entry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entry.cpp">
+    <ClCompile Include="FbxFileNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

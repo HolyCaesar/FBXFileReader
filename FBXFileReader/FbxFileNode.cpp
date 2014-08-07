@@ -1,7 +1,7 @@
-#include "FileNode.h"
 
+#include "FbxFileNode.h"
 
-FileNode::FileNode(void)
+FbxFileNode::FbxFileNode(void)
 {
 	_property_name = "";
 	_primitive_data.clear();
@@ -9,11 +9,11 @@ FileNode::FileNode(void)
 }
 
 
-FileNode::~FileNode(void)
+FbxFileNode::~FbxFileNode(void)
 {
 }
 
-void FileNode::Destroy()
+void FbxFileNode::Destroy()
 {
 	_property_name = "";
 	_primitive_data.clear();

@@ -1,28 +1,26 @@
 #pragma once
-#pragma once
 
 #include "CommonHeader.h"
-#include "FileNode.h"
+#include "FbxFileNode.h"
+
+// TODO I probably need a new Model class to extract model info from FbxFileReader Class
+// Just do everything here by the time being
+struct JointInfo{
+	string _name;
+	long _id;
+	float _pre_rotation[3];
+	float _lcl_rotation[3];
+	float _lcl_translation[3];
+	float _lcl_scale[3];
+};
+
+struct BindPoseInfo{
+	long _id;
+	float _matrix[16];
+};
 
 class FbxFileReader
 {
-	// TODO I probably need a new Model class to extract model info from FbxFileReader Class
-	// Just do everything here by the time being
-	struct JointInfo{
-		string _name;
-		long _id;
-		float _pre_rotation[3];
-		float _lcl_rotation[3];
-		float _lcl_translation[3];
-		float _lcl_scale[3];
-	};
-
-	struct BindPoseInfo{
-		long _id;
-		float _matrix[16];
-	};
-
-
 public:
 	FbxFileReader(void);
 	~FbxFileReader(void);
@@ -34,7 +32,7 @@ public:
 	*/
 	void ReadFbxASCIIFile(const string file_path);
 
-	void DisplayFbxContent(FileNode* node);
+	void DisplayFbxContent(FbxFileNode* node);
 
 	/*
 	* Recursively clear the three
@@ -44,7 +42,9 @@ public:
 	/*
 	* Getters and Setters
 	*/
-	FileNode* GetRoot() { return _file_root; }
+	FbxFileNode* GetRoot() { return _file_root; }
+	vector<JointInfo> GetJointInfo() { return _joint_info_vec; }
+	vector<BindPoseInfo> GetBindPoseInfo() { return _bind_pose_info_vec; }
 
 	//////////////////////////////////////////////////////////////
 
@@ -57,20 +57,20 @@ private:
 	/*
 	* Recursively construct a tree structure for the property
 	*/
-	void ConstructTreeNode(ifstream &input_file, FileNode* root);
+	void ConstructTreeNode(ifstream &input_file, FbxFileNode* root);
 
 	/*
 	* Clean the Tree Structure
 	*/
-	void CleanSubProperties(FileNode* node);
+	void CleanSubProperties(FbxFileNode* node);
 
 	/*
 	* Locate certain type of property
 	*/
-	void LocateProperty(FileNode* root, string property_name, vector<FileNode>& res, bool flag);
+	void LocateProperty(FbxFileNode* root, string property_name, vector<FbxFileNode>& res, bool flag);
 
 private:
-	FileNode* _file_root;
+	FbxFileNode* _file_root;
 
 	vector<JointInfo> _joint_info_vec;
 	vector<BindPoseInfo> _bind_pose_info_vec;

@@ -77,13 +77,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h" />
+    <ClInclude Include="FbxFileNode.h" />
     <ClInclude Include="FbxFileReader.h" />
-    <ClInclude Include="FileNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entry.cpp" />
+    <ClCompile Include="FbxFileNode.cpp" />
     <ClCompile Include="FbxFileReader.cpp" />
-    <ClCompile Include="FileNode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
